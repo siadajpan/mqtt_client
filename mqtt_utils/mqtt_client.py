@@ -72,9 +72,9 @@ class MQTTClient:
 
     def on_message(self, client, userdata, msg):
         """
-        This function is run every time client receives a message.
-        Message is put on the message queue. It's up to application running
-        MQTTClient to get this message from queue
+        This function is run every time client receives a messages.
+        Message is put on the messages queue. It's up to application running
+        MQTTClient to get this messages from queue
         :param client:
         :param userdata:
         :param msg:
@@ -86,13 +86,13 @@ class MQTTClient:
 
     def publish(self, topic: str, payload: Optional[str]):
         """
-        Publish message to topic.
+        Publish messages to topic.
         :param topic:
         :param payload:
         :raises: Exception when publishing topic raised one
         :return:
         """
-        self.logger.info(f'Publishing message topic: {topic}, '
+        self.logger.info(f'Publishing messages topic: {topic}, '
                          f'payload: {payload}')
         try:
             self.client.publish(topic, payload)

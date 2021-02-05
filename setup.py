@@ -8,8 +8,8 @@ with open('requirements.txt.txt', 'r') as f:
             requirements.append(line)
 
 setup(
-    name='mqtt_client',
-    version='0.1.0',
+    name='mqtt_utils',
+    version='0.2.0',
     description='Library making connection to mqtt broker, '
                 'receiving and sending messages',
     author='Karol Misiarz',
