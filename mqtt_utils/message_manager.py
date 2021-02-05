@@ -81,7 +81,6 @@ class MessageManager(Thread):
         """
         while not self._stop_thread:
             message: mqtt.MQTTMessage = self._message_queue.get()
-            print('message', message)
             self._logger.debug(f'Got messages topic: {message.topic} '
                                f'payload: {message.payload}')
             try:
