@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 requirements = []
-with open('requirements.txt.txt', 'r') as f:
+with open('requirements.txt', 'r') as f:
     for line in f:
         line = line.strip()
         if len(line) > 0:
