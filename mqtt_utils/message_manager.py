@@ -16,7 +16,7 @@ class MessageManager(Thread):
         super().__init__()
         self._mqtt_client = MQTTClient()
         self._mqtt_client.registered_topics = [msg.topic for msg in messages]
-        self._messages: List[MQTTMessage] = []
+        self._messages: List[MQTTMessage] = messages + [Empty()]
         self._error_topic = error_topic
         self._logger = logging.getLogger(self.__class__.__name__)
         self._message_queue = self._mqtt_client.message_queue
