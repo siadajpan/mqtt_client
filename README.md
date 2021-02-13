@@ -7,6 +7,38 @@ Install requirements using
 pip install -r requirements.txt
 ```
 
+## MessageManager
+Message menager is a thread that waits for the queue from mqtt_client and 
+executes messages registered at constructor
+If you are using message manager, you don't need to initialize MQTTClient 
+anymore.
+
+```python3
+from mqtt_utils.message_manager import MessageManager, MQTTMessage
+
+# Define your message that inherit after MQTTMessage
+messages = [MQTTMessage('topic')]
+
+# Create message manager. It creates mqtt clients and subscribe to topics from
+# messages
+message_manager = MessageManager(messages)
+
+# You can update credentials if your broker needs it
+message_manager.update_credentials('user', 'password')
+
+# Connect to address and port from broker
+message_manager.connect('address', 1234)
+
+# Start the thread
+message_manager.start()
+
+# Loop forever (blocking method) -> This calls mqtt client loop_forever
+message_manager.loop_forever()
+
+# You need to stop it if loop forever is stopped e.g. by KeyboardInterrupt
+message_manager.stop()
+```
+
 ## MQTTClient example
 
 ```python3
@@ -40,32 +72,4 @@ publish_method = mqtt_client.publish('other_topic', 'payload')
 
 # Start looping. This function is blocking
 mqtt_client.loop_forever()
-```
-
-## MessageManager
-Message menager is a thread that waits for the queue from mqtt_client and 
-executes messages registered at constructor
-Message manager wraps mqtt_client too.
-
-```python3
-from mqtt_utils.message_manager import MessageManager, MQTTMessage
-
-# Define your message that inherit after MQTTMessage
-messages = [MQTTMessage('topic')]
-
-# Create message manager. It creates mqtt clients and subscribe to topics from
-# messages
-message_manager = MessageManager(messages)
-
-# You can update credentials if your broker needs it
-message_manager.update_credentials('user', 'password')
-
-# Connect to address and port from broker
-message_manager.connect('address', 1234)
-
-# Start the thread
-message_manager.start()
-
-# Stop it anytime
-message_manager.stop()
 ```
