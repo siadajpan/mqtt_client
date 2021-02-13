@@ -18,18 +18,18 @@ class TestMessageManager(unittest.TestCase):
     @patch('mqtt_utils.messages.utils.payload_from_json')
     def test_execute_message_checks_message_by_topic(self, payload_from_json_mock):
         # given
-        self.message_manager.check_message = MagicMock(return_value=None)
+        self.message_manager._check_message = MagicMock(return_value=None)
 
         # when
-        self.message_manager.execute_message('topic', 'message')
+        self.message_manager._execute_message('topic', 'message')
 
         # then
-        self.message_manager.check_message.assert_called()
+        self.message_manager._check_message.assert_called()
         payload_from_json_mock.assert_not_called()
 
     def test_stop_running(self):
         # given
-        self.message_manager.execute_message = MagicMock()
+        self.message_manager._execute_message = MagicMock()
         self.message_manager._message_queue = queue.Queue()
 
         # when
@@ -38,7 +38,7 @@ class TestMessageManager(unittest.TestCase):
         # then
         self.message_manager.stop()
         time.sleep(0.01)
-        self.message_manager.execute_message.assert_called_once()
+        self.message_manager._execute_message.assert_called_once()
 
     def test_message_manager_gets_correct_message(self):
         # given
@@ -49,7 +49,7 @@ class TestMessageManager(unittest.TestCase):
         messages = [message1, message2]
         self.message_manager._mqtt_client.message_queue = queue.Queue()
         self.message_manager.subscribe_messages(messages)
-        self.message_manager.execute_message = MagicMock()
+        self.message_manager._execute_message = MagicMock()
 
         # when
         self.message_manager.start()
@@ -57,6 +57,6 @@ class TestMessageManager(unittest.TestCase):
 
         # then
         time.sleep(0.01)
-        self.message_manager.execute_message.assert_called_with(
+        self.message_manager._execute_message.assert_called_with(
             'topic2', 'payload2')
         self.message_manager.stop()
