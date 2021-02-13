@@ -90,6 +90,9 @@ class MessageManager(Thread):
                     self.publish(self._error_topic, ex)
         self._logger.debug('Exiting')
 
+    def loop_forever(self):
+        self._mqtt_client.loop_forever()
+
     def stop(self):
         self._logger.debug('Stopping')
         self._stop_thread = True
