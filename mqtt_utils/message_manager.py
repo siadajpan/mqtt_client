@@ -15,10 +15,8 @@ class MessageManager(Thread):
                  error_topic: Optional[str] = None):
         super().__init__()
         self._mqtt_client = MQTTClient()
-        self._topic_registered = []
-        self._messages: List[MQTTMessage] = []
-        self.subscribe_messages(messages)
-
+        self._mqtt_client.registered_topics = [msg.topic for msg in messages]
+        self._messages: List[MQTTMessage] = messages + [Empty()]
         self._error_topic = error_topic
         self._logger = logging.getLogger(self.__class__.__name__)
         self._message_queue = self._mqtt_client.message_queue
@@ -28,10 +26,8 @@ class MessageManager(Thread):
     def subscribe_messages(self, messages):
         for message in messages:
             self._messages.append(message)
-            self._topic_registered.append(message.topic)
 
-        self._topic_registered = list(set(self._topic_registered))
-        self._mqtt_client.subscribe(self._topic_registered)
+        self._mqtt_client.subscribe([msg.topic for msg in messages])
 
     def update_credentials(self, user, password):
         self._mqtt_client.update_username_password(user, password)
@@ -44,8 +40,8 @@ class MessageManager(Thread):
                            f'payload: {payload}')
         self._publish_method(topic, payload)
 
-    def execute_message(self, topic: str, payload: str):
-        message = self.check_message(topic)
+    def _execute_message(self, topic: str, payload: str):
+        message = self._check_message(topic)
         if not message:
             return
 
@@ -57,13 +53,14 @@ class MessageManager(Thread):
                                f'Exception: {ex}')
             raise ex
 
-    def check_message(self, topic) -> Optional[MQTTMessage]:
+    def _check_message(self, topic) -> Optional[MQTTMessage]:
         """
         Check if topic is registered and payload is properly formatted
         """
         self._logger.debug(f'Searching for messages topic: {topic}')
-        if topic in self._topic_registered:
-            return self._messages[self._topic_registered.index(topic)]
+        for message in self._messages:
+            if message.topic == topic:
+                return message
 
         error_message = \
             f'Received messages not registered. Registered topics: ' \
@@ -84,7 +81,7 @@ class MessageManager(Thread):
             self._logger.debug(f'Got messages topic: {message.topic} '
                                f'payload: {message.payload}')
             try:
-                self.execute_message(message.topic, message.payload)
+                self._execute_message(message.topic, message.payload)
             except BaseException as ex:
                 if self._error_topic:
                     self.publish(self._error_topic, ex)
